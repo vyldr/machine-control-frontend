@@ -1,1 +1,22 @@
-<p>sign-up works!</p>
+<div class="container">
+        <mat-card id="signin-card">
+            <mat-card-title>Sign Up</mat-card-title>
+            <mat-card-content>
+                <form action="/signin" method="POST">
+                    <mat-form-field color="accent">
+                        <input matInput name="user" placeholder="Username" required>
+                    </mat-form-field>
+                    <br>
+                    <mat-form-field color="accent">
+                        <input matInput name="pass" placeholder="Password" type="password" required>
+                    </mat-form-field>
+                    <br>
+                    <mat-form-field color="accent">
+                        <input matInput name="pass" placeholder="Type password again" type="password" required>
+                    </mat-form-field>
+                    <a id="signup" mat-button routerLink="">Sign In</a>
+                    <button id="submit" type="submit" mat-raised-button color="accent" >Sign In</button>
+                </form>
+            </mat-card-content>
+        </mat-card>
+    </div>

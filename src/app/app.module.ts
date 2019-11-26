@@ -23,7 +23,7 @@ const appRoutes: Routes = [
   { path: 'signup',      component: SignUpComponent  },
   { path: 'manage',      component: ManageComponent  },
   { path: 'add',         component: AddComponent     },
-  { path: 'operate/:id', component: OperateComponent },
+  { path: 'operate', component: OperateComponent },
 ];
 
 @NgModule({
