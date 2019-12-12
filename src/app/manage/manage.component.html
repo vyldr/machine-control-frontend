@@ -1,1 +1,17 @@
-<p>manage works!</p>
+<div class="container">
+    <mat-card id="signin-card">
+        <mat-card-title>Manage your devices</mat-card-title>
+        <mat-card-content>
+            <p *ngIf="response == 'no'">Something's wrong</p>
+            <mat-nav-list>
+                <a mat-list-item routerLink="/operate/{{bot.id_int + ':' + bot.crazy_code + ':' + bot.identifier}}/{{bot.identifier}}" *ngFor="let bot of bots"> {{ bot.identifier }} </a>
+            </mat-nav-list>
+            <form>
+                <mat-form-field color="accent">
+                    <input matInput name="pass" placeholder="New device" [(ngModel)]="name">
+                </mat-form-field>
+                <button id="submit" type="submit" mat-raised-button (click)="newBot()" color="accent">Create</button>
+            </form>
+        </mat-card-content>
+    </mat-card>
+</div>

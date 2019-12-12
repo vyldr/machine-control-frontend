@@ -1,6 +1,8 @@
 <mat-toolbar color="primary">
   <span>Machine Controller</span>
   <div class="spacer"></div>
-  <a id="signup" mat-raised-button color="accent" routerLink="signup">Sign Up</a>
+  <a *ngIf="route == '/'" id="signup" mat-raised-button color="accent" routerLink="signup">Sign Up</a>
+  <a *ngIf="route == '/signup'" id="signin" mat-raised-button color="accent" routerLink="">Sign In</a>
+  <a *ngIf="route != '/' && route != '/signup'" id="signout" mat-raised-button color="accent" (click)="signout()">Sign Out</a>
 </mat-toolbar>
 <router-outlet></router-outlet>

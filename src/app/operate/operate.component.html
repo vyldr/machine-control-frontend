@@ -1,1 +1,18 @@
-<p>operate works!</p>
+<div class="container">
+    <mat-card id="operate-card">
+        <mat-card-title>Controlling: {{this.name}}</mat-card-title>
+        <mat-card-subtitle>Code: {{this.deviceName}}</mat-card-subtitle>
+        <br>
+        <mat-card-subtitle>
+            You can control {{this.name}} by sending a message below, using the keyboard, or using a gamepad.  
+            <br>
+            To connect {{this.name}}, have it connect to a WebSocket on this server and send the code above when it connects.  
+        </mat-card-subtitle>
+        <mat-card-content>
+            <mat-form-field color="accent">
+                <input matInput name="message" id="message" [(ngModel)]="message" placeholder="Send Message">
+            </mat-form-field>
+            <button id="submit" mat-raised-button color="accent" (click)="sendMessage(this);">Send</button>
+        </mat-card-content>
+    </mat-card>
+</div>

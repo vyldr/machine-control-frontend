@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +8,17 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Machine Control';
+  route = this.router.url;
+  activatedRoute: any;
+
+  constructor(private router: Router) {
+    this.router.events.subscribe((event) => {
+      this.route = this.router.url;
+    });
+  }
+
+  signout() {
+    localStorage.clear();
+    this.router.navigate(['/']);
+  }
 }

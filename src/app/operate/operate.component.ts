@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-operate',
@@ -8,13 +10,17 @@ import { Component, OnInit } from '@angular/core';
 export class OperateComponent implements OnInit {
 
   ws;
-  message;
+  message: string;
   input;
   gp;
   gamepadConnected;
+  deviceName;
+  name: any;
 
 
-  constructor() {
+  constructor(private activatedRoute: ActivatedRoute, private router: Router) {
+    // force route reload whenever params change;
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
   }
 
   // Send the input to the server
@@ -22,39 +28,45 @@ export class OperateComponent implements OnInit {
     if (self.gamepadConnected)
       self.gamepadInput(self);
     self.ws.send(JSON.stringify(self.input));
-    // display.innerHTML = JSON.stringify(input, null, 4);
-    // console.log(self.input);
-    self.input.keys = []; // clear the keys
+    self.input.message = '';
   }
 
+  sendMessage(self) {
+    self.input.message = self.message;
+    self.message = '';
+  }
+
+  // Add a key to the list
   keydown(self, event) {
-    self.input.keys.push(event.key);
-    switch (event.key) {
-      // case "ArrowUp":
-      //   self.input.up = true;
-      //   break;
-      // case "ArrowDown":
-      //   self.input.down = true;
-      //   break;
-      // case "ArrowLeft":
-      //   self.input.left = true;
-      //   break;
-      // case "ArrowRight":
-      //   self.input.right = true;
-      //   break;
-      // case " ":
-      //   self.input.space = true;
-      //   break;
-      case "d": // Debug
-        console.log(self.input)
-        break;
+    if (document.activeElement.id != "message") { // Skip if the user is typing a message
+      if (self.input.keys.indexOf(event.key) == -1) {
+        self.input.keys.push(event.key);
+      }
+      if (event.key == 'd') {
+        console.log(self.deviceName);
+      }
+    }
+
+    // Press enter while typing a message
+    else if (event.key == "Enter") {
+      self.sendMessage(self);
     }
   }
 
+  // Remove the key from the list
   keyup(self, event) {
-
+    var index = self.input.keys.indexOf(event.key);
+    if (index > -1) {
+      self.input.keys.splice(index, 1);
+    }
   }
 
+  // Clear all inputs to clean up
+  clearInput(self) {
+    self.input.keys = [];
+  }
+
+  // Get button and axis inputs from a gamepad
   gamepadInput(self) {
     // @ts-ignore
     var gamepads = navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads : []);
@@ -67,16 +79,19 @@ export class OperateComponent implements OnInit {
     for (var i = 0; i < gamepads[0].buttons.length; i++)
       buttons[i] = gamepads[0].buttons[i].pressed;
     self.input.buttons = buttons;
-
   };
 
 
   ngOnInit() {
     var self = this;
+
     // Set up the WebSocket
     // var HOST = location.origin.replace(/^http/, 'ws');
-    var HOST = 'ws://localhost:5000';
+    var HOST = environment.websocket;
     this.ws = new WebSocket(HOST);
+    this.deviceName = this.activatedRoute.snapshot.params['id'];
+    this.name = this.activatedRoute.snapshot.params['name'];
+
     this.gamepadConnected = false;
 
     // Data from the server
@@ -84,27 +99,30 @@ export class OperateComponent implements OnInit {
     //   self.message = JSON.parse(event.data);
     // };
 
-    // var display = document.getElementById("display");
-
     this.ws.onopen = function () {
 
       // Tell the server our group name
-      self.ws.send('foo');
+      self.ws.send(self.deviceName);
 
       // Start sending data to the server
       setInterval(self.send, 16, self);
     }
 
-    // Unfocus the text box because we are using the keyboard for input
-    // document.getElementById("group").blur();
-
     // Which keys are currently pressed?
     this.input = {
       keys: [],
       buttons: [],
-      axes: []
+      axes: [],
+      message: "",
     }
 
+    // Handle changing tab focus
+    window.addEventListener('blur', (event) => {
+      self.clearInput(self);
+    }, false);
+    window.addEventListener('focus', (event) => {
+      self.clearInput(self);
+    }, false);
 
     // Handle keydowns
     document.addEventListener('keydown', (event) => {
@@ -113,18 +131,27 @@ export class OperateComponent implements OnInit {
 
     // Handle keyups
     document.addEventListener('keyup', (event) => {
+      self.keyup(self, event);
     }, false);
 
+    // Connect a gamepad
     window.addEventListener("gamepadconnected", function () {
       // @ts-ignore
       self.gp = navigator.getGamepads()[0];
       // @ts-ignore
-      console.log("Gamepad " + gp.index + " connected: " + gp.id + ". " + gp.buttons.length + " buttons, " + gp.axes.length + " axes.");
+      console.log("Gamepad " + self.gp.index + " connected: " + self.gp.id + ". " + self.gp.buttons.length + " buttons, " + self.gp.axes.length + " axes.");
 
       self.gamepadConnected = true; //Interval = setInterval(self.gamepadInput, 16, self);
     });
 
 
+  }
+
+  ngOnDestroy() {
+    // Close the websocket
+    this.ws.close();
+
+    // TODO: Remove the event listeners
   }
 
 }

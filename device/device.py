@@ -35,7 +35,12 @@ async def mainLoop():
 		jsonInput = await ws.recv()
 		input = json.loads(jsonInput)
 
+		print(input["message"])
 		print(input["keys"])
+		print(input["buttons"])
+		for axis in input["axes"]:
+			print(axis)
+		print(' ')
 		# 	GPIO.output(24,GPIO.HIGH)
 		# else:
 		# 	GPIO.output(24,GPIO.LOW)
